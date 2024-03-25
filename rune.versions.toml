@@ -1,0 +1,36 @@
+[versions]
+kotlin = "1.9.22"
+
+shadow = "8.1.1"
+paperweight = "1.5.11"
+
+coroutines = "1.8.0"
+
+purpur = "1.19.4-R0.1-SNAPSHOT"
+brigadier = "1.0.18"
+
+commodore = "2.2"
+adventure = "4.12.0"
+plugin-yml = "0.6.0"
+protocol-lib = "5.0.0"
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+
+shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+plugin-yml = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "plugin.yml" }
+
+paperweight-userdev = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
+
+[libraries]
+purpur = { module = "org.purpurmc.purpur:purpur-api", version.ref = "purpur" }
+purpur-dev-bundle = { module = "org.purpurmc.purpur:dev-bundle", version.ref = "purpur" }
+
+brigadier = { module = "com.mojang:brigadier", version.ref = "brigadier" }
+commodore = { module = "me.lucko:commodore", version.ref = "commodore" }
+
+adventure-kotlin = { module = "net.kyori:adventure-extra-kotlin", version.ref = "adventure" }
+
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+
+protocol = { module = "com.comphenix.protocol:ProtocolLib", version.ref = "protocol-lib" }
