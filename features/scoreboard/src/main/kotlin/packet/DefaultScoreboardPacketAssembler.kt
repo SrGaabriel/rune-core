@@ -7,6 +7,7 @@ import com.comphenix.protocol.wrappers.AdventureComponentConverter
 import com.comphenix.protocol.wrappers.EnumWrappers
 import com.comphenix.protocol.wrappers.WrappedChatComponent
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.ChatColor
 import java.util.*
 
@@ -78,12 +79,14 @@ public class DefaultScoreboardPacketAssembler(): ScoreboardPacketAssembler {
 
     override fun updateScore(objectiveId: String, text: Component, score: Int, action: EnumWrappers.ScoreboardAction): PacketContainer {
         val packet = PacketContainer(PacketType.Play.Server.SCOREBOARD_SCORE)
-        packet.strings.write(0, text.toString())
+        val convertedString = LegacyComponentSerializer.legacySection().serialize(text).ifBlank {
+            " ".repeat(score)
+        }
+
+        packet.strings.write(0, convertedString)
         packet.scoreboardActions.write(0, action)
         packet.strings.write(1, objectiveId)
-        if (action != EnumWrappers.ScoreboardAction.CHANGE) {
-            packet.integers.write(0, score)
-        }
+        packet.integers.write(0, score)
         return packet
     }
 

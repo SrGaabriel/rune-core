@@ -42,7 +42,7 @@ tasks {
 
         publications {
             create<MavenPublication>("Rune") {
-                groupId = rootProject.group.toString()
+                groupId = "com.runerealms.core"
                 version = Project.Version
                 artifactId = "rune-${project.name}"
 
@@ -52,6 +52,29 @@ tasks {
 
                 pom {
                     name.set("Rune")
+                    description.set("Rune is the core plugin for the RuneRealms Minecraft server.")
+
+                    developers {
+                        developer {
+                            name.set("SrGaabriel")
+                            email.set("srgaabreil@protonmail.com")
+                        }
+                    }
+
+                    licenses {
+                        license {
+                            name.set("MIT")
+                            url.set("https://opensource.org/licenses/mit-license.php")
+                        }
+                    }
+                }
+                repositories {
+                    maven(Project.ReleasesRepository) {
+                        credentials {
+                            username = System.getenv("NEXUS_USER")
+                            password = System.getenv("NEXUS_PASSWORD")
+                        }
+                    }
                 }
             }
         }

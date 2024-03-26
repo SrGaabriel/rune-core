@@ -29,6 +29,11 @@ public class Scoreboards(plugin: RunePlugin): RuneFeatureInstance(plugin) {
         viewers.forEach { viewersMap[it] = scoreboard }
     }
 
+    internal fun getViewers(scoreboard: Scoreboard): Set<UUID> {
+        val viewersMap: MutableMap<UUID, Scoreboard> = CorePlugin.instance.getGlobalFeatureDataset("scoreboards.viewers") ?: error("Scoreboards viewers not found")
+        return viewersMap.filter { it.value == scoreboard }.keys
+    }
+
     internal fun unregisterViewers(scoreboard: Scoreboard, viewers: Set<UUID>) {
         val viewersMap: MutableMap<UUID, Scoreboard> = CorePlugin.instance.getGlobalFeatureDataset("scoreboards.viewers") ?: error("Scoreboards viewers not found")
         viewers.forEach { viewersMap.remove(it) }
@@ -40,13 +45,11 @@ public class Scoreboards(plugin: RunePlugin): RuneFeatureInstance(plugin) {
             createGlobalDataset("scoreboards.viewers", mutableMapOf<UUID, Scoreboard>())
 
             var taskLifespan = 0
-            println("Done!!!")
             Bukkit.getScheduler().runTaskTimerAsynchronously(core, Runnable {
                 val scoreboards: MutableList<Scoreboard> = core.getGlobalFeatureDataset("scoreboards.list") ?: error("Scoreboards list not found")
                 scoreboards.forEach { scoreboard ->
                     if (!scoreboard.valid) return@forEach
                     if (taskLifespan % scoreboard.globalUpdateTickInterval == 0) {
-                        println("ZA WURDO")
                         scoreboard.update(floor(taskLifespan / scoreboard.globalUpdateTickInterval.toDouble()).toInt())
                         return@forEach
                     }

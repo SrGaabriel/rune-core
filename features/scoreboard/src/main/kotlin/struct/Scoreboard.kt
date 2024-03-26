@@ -6,14 +6,13 @@ import com.runerealms.core.RunePlugin
 import com.runerealms.core.feature.scoreboard.Scoreboards
 import com.runerealms.core.feature.scoreboard.packet.ScoreboardPacketAssembler
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.TextColor
-import org.bukkit.ChatColor
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import java.util.UUID
 
 public class Scoreboard(
     plugin: RunePlugin,
-    public val id: String,
+    public val id: String
 ) {
     public var title: ScoreboardLine? = null
     public var globalUpdateTickInterval: Int = 20
@@ -24,18 +23,31 @@ public class Scoreboard(
     private val packetAssembler: ScoreboardPacketAssembler get() = feature.packetAssembler
 
     public val lines: MutableList<ScoreboardLine> = mutableListOf()
-    internal val viewers = mutableSetOf<Player>()
+    internal val viewers get() = feature.getViewers(this)
 
-    public fun title(init: ScoreboardLine.() -> Unit) {
-        title = ScoreboardLine().apply(init)
+    public fun title(customUpdateTickInterval: Int? = null, init: ScoreboardLine.Builder.(Player) -> Unit) {
+        title = buildLine(customUpdateTickInterval, init)
     }
 
-    public fun line(customUpdateTickInterval: Int? = null, init: ScoreboardLine.() -> Unit) {
-        lines.add(ScoreboardLine(customUpdateTickInterval).apply(init))
+    public fun line(customUpdateTickInterval: Int? = null, init: ScoreboardLine.Builder.(Player) -> Unit) {
+        lines.add(buildLine(customUpdateTickInterval, init))
+    }
+
+    public fun buildLine(customUpdateTickInterval: Int? = null, init: ScoreboardLine.Builder.(Player) -> Unit): ScoreboardLine {
+        val line = ScoreboardLine(
+            provider = { player ->
+                ScoreboardLine.Builder().apply { init(player) }.components
+            },
+            customUpdateTickInterval = customUpdateTickInterval
+        )
+        return line
+    }
+
+    public fun emptyLine() {
+        line { +"" }
     }
 
     public fun update(state: Int) {
-        println(state)
         if (title == null) {
             throw IllegalStateException("Scoreboard title is not set")
         } else if (lines.isEmpty()) {
@@ -46,44 +58,54 @@ public class Scoreboard(
         lines.forEach { line ->
             updateLine(line, state)
         }
-        /*
-        sendPacket(player, packetAssembler.createObjective(title!!.components.first(), player.name))
-sendPacket(player, packetAssembler.displayObjective(player.name))
-sendPacket(player, packetAssembler.createTeam(Component.text("Hello")))
-sendPacket(player, packetAssembler.updateScore("${ChatColor.BLUE}Hello", 1, EnumWrappers.ScoreboardAction.CHANGE))
- */
     }
 
     public fun updateTitle(state: Int) {
         if (title == null) {
             throw IllegalStateException("Scoreboard title is not set")
         }
-        sendPacket(packetAssembler.updateObjective(id, title!!.components[state % title!!.components.size]))
-        sendPacket(packetAssembler.displayObjective(id))
+        sendIndividualPacket {
+            val lines = title!!.provider(it)
+            packetAssembler.updateObjective(id, lines[state % lines.size])
+        }
     }
 
     public fun updateLine(line: ScoreboardLine, state: Int) {
+        val score = lines.size - this@Scoreboard.lines.indexOf(line)
         if (line !in lines) {
             throw IllegalArgumentException("Line is not in the scoreboard")
         }
-        sendPacket(packetAssembler.updateScore(id, line.components[state % line.components.size], lines.size - lines.indexOf(line), EnumWrappers.ScoreboardAction.CHANGE))
+
+        sendIndividualPackets { player ->
+            val components: List<Component> = line.provider(player)
+
+            val previousState = line.internalCache[player]
+            val newState = components[state % components.size]
+            println(this@Scoreboard.lines.joinToString(", ") { LegacyComponentSerializer.legacyAmpersand().serialize(it.provider(player)[state % components.size]) })
+
+            if (state != 0 && previousState != null && previousState != newState) {
+                add(packetAssembler.updateScore(id, previousState, score, EnumWrappers.ScoreboardAction.REMOVE))
+            }
+
+            line.internalCache[player] = newState
+            add(packetAssembler.updateScore(id, newState, score, EnumWrappers.ScoreboardAction.CHANGE))
+        }
     }
 
     public fun show(player: Player) {
-        if (player in viewers) {
+        if (player.uniqueId in viewers) {
             throw IllegalArgumentException("Player is already viewing the scoreboard")
         }
-        sendPacket(packetAssembler.createObjective(id, title!!.components.first()))
-        viewers.add(player)
-        feature.unregisterViewers(this, setOf(player.uniqueId))
+        protocolManager.sendServerPacket(player, packetAssembler.createObjective(id, title!!.provider(player).first()))
+        protocolManager.sendServerPacket(player, packetAssembler.displayObjective(id))
+        feature.registerViewers(this, setOf(player.uniqueId))
     }
 
     public fun hide(player: Player) {
-        if (player !in viewers) {
+        if (player.uniqueId !in viewers) {
             throw IllegalArgumentException("Player is not viewing the scoreboard")
         }
         sendPacket(packetAssembler.removeObjective(id))
-        viewers.remove(player)
         feature.unregisterViewers(this, setOf(player.uniqueId))
     }
 
@@ -91,9 +113,26 @@ sendPacket(player, packetAssembler.updateScore("${ChatColor.BLUE}Hello", 1, Enum
         feature.unregister(this)
     }
 
-    private fun sendPacket( packet: PacketContainer) {
-        viewers.forEach { player ->
+    private fun sendPacket(packet: PacketContainer) {
+        viewers.forEach { playerUuid ->
+            val player = Bukkit.getPlayer(playerUuid) ?: return@forEach feature.unregisterViewers(this, setOf(playerUuid))
             protocolManager.sendServerPacket(player, packet)
+        }
+    }
+
+    private fun sendIndividualPacket(packet: (Player) -> PacketContainer) {
+        viewers.forEach {
+            val player = Bukkit.getPlayer(it) ?: return@forEach feature.unregisterViewers(this, setOf(it))
+            protocolManager.sendServerPacket(player, packet(player))
+        }
+    }
+
+    private fun sendIndividualPackets(packet: MutableList<PacketContainer>.(Player) -> Unit) {
+        viewers.forEach {
+            val player = Bukkit.getPlayer(it) ?: return@forEach feature.unregisterViewers(this, setOf(it))
+            mutableListOf<PacketContainer>().also{ list -> packet(list, player) }.forEach { packet ->
+                protocolManager.sendServerPacket(player, packet)
+            }
         }
     }
 }
