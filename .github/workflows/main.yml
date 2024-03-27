@@ -21,25 +21,25 @@ jobs:
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: --stacktrace --info build
+          arguments: --stacktrace --info reobfJar
 
       - uses: actions/upload-artifact@v2
         name: Upload Core
         with:
           name: Core
-          path: core/build/libs/
+          path: core//libs/
 
       - uses: actions/upload-artifact@v2
         name: Upload Commands
         with:
           name: Commands
-          path: features/commands/build/libs/
+          path: features/commands//libs/
 
       - uses: actions/upload-artifact@v2
         name: Upload Menus
         with:
           name: Menus
-          path: features/menus/build/libs/
+          path: features/menus//libs/
 
       - uses: actions/upload-artifact@v2
         name: Upload Scoreboards
