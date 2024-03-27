@@ -1,0 +1,48 @@
+name: Build and Publish
+
+on: [ push, pull_request ]
+
+jobs:
+  build:
+    name: Build modules
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: --stacktrace --info build
+
+      - uses: actions/upload-artifact@v2
+        name: Upload Core
+        with:
+          name: Core
+          path: core/build/libs/
+
+      - uses: actions/upload-artifact@v2
+        name: Upload Commands
+        with:
+          name: Commands
+          path: features/commands/build/libs/
+
+      - uses: actions/upload-artifact@v2
+        name: Upload Menus
+        with:
+          name: Menus
+          path: features/menus/build/libs/
+
+      - uses: actions/upload-artifact@v2
+        name: Upload Scoreboards
+        with:
+          name: Scoreboard
+          path: features/scoreboard/build/libs/
