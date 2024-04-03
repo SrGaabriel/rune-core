@@ -4,7 +4,9 @@ kotlin = "1.9.22"
 shadow = "8.1.1"
 paperweight = "1.5.11"
 
+datetime = "0.6.0-RC.2"
 coroutines = "1.8.0"
+serialization = "1.6.3"
 
 purpur = "1.19.4-R0.1-SNAPSHOT"
 brigadier = "1.0.18"
@@ -14,8 +16,12 @@ adventure = "4.12.0"
 plugin-yml = "0.6.0"
 protocol-lib = "5.0.0"
 
+exposed="0.49.0"
+hikaricp = "5.0.1"
+
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlinx-seralization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
 plugin-yml = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "plugin.yml" }
@@ -31,6 +37,15 @@ commodore = { module = "me.lucko:commodore", version.ref = "commodore" }
 
 adventure-kotlin = { module = "net.kyori:adventure-extra-kotlin", version.ref = "adventure" }
 
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-serialization-hocon = { module = "org.jetbrains.kotlinx:kotlinx-serialization-hocon", version.ref = "serialization" }
 
 protocol = { module = "com.comphenix.protocol:ProtocolLib", version.ref = "protocol-lib" }
+
+exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
+exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
+exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
+exposed-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datetime", version.ref = "exposed" }
+
+hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }

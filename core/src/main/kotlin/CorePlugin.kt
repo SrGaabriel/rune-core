@@ -1,5 +1,7 @@
 package com.runerealms.core
 
+import com.runerealms.core.config.CoreConfig
+import com.runerealms.core.config.hoconConfig
 import com.runerealms.core.feature.RuneFeature
 
 public class CorePlugin: RunePlugin() {
@@ -7,8 +9,14 @@ public class CorePlugin: RunePlugin() {
     internal val globalFeatureData: MutableMap<String, Any> = mutableMapOf()
     internal val globallyInstalledFeatures = mutableListOf<RuneFeature<*>>()
 
-    override fun onStart() {
+    public lateinit var config: CoreConfig
 
+    init {
+        instance = this
+    }
+
+    override fun onStart() {
+        config = hoconConfig("core", CoreConfig.Default)
     }
 
     public inline fun <reified T : Any> getGlobalFeatureDataset(key: String): T? {
@@ -16,6 +24,6 @@ public class CorePlugin: RunePlugin() {
     }
 
     public companion object {
-        public val instance: CorePlugin get() = getPlugin(CorePlugin::class.java)
+        public lateinit var instance: CorePlugin
     }
 }

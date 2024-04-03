@@ -24,6 +24,7 @@
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/features" />
             <option value="$PROJECT_DIR$/features/commands" />
+            <option value="$PROJECT_DIR$/features/database" />
             <option value="$PROJECT_DIR$/features/menus" />
             <option value="$PROJECT_DIR$/features/scoreboard" />
           </set>

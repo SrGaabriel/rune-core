@@ -71,8 +71,8 @@ tasks {
                 repositories {
                     maven(Project.ReleasesRepository) {
                         credentials {
-                            username = System.getenv("NEXUS_USER")
-                            password = System.getenv("NEXUS_PASSWORD")
+                            username = System.getenv("PUBLISH_USER")
+                            password = System.getenv("PUBLISH_TOKEN")
                         }
                     }
                 }

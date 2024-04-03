@@ -3,6 +3,8 @@ package com.runerealms.core.feature.scoreboard
 import com.comphenix.protocol.ProtocolLibrary
 import com.runerealms.core.CorePlugin
 import com.runerealms.core.RunePlugin
+import com.runerealms.core.ext.inTicks
+import com.runerealms.core.ext.inWholeTicksInt
 import com.runerealms.core.feature.RuneFeature
 import com.runerealms.core.feature.RuneFeatureInstance
 import com.runerealms.core.feature.scoreboard.packet.DefaultScoreboardPacketAssembler
@@ -49,17 +51,18 @@ public class Scoreboards(plugin: RunePlugin): RuneFeatureInstance(plugin) {
                 val scoreboards: MutableList<Scoreboard> = core.getGlobalFeatureDataset("scoreboards.list") ?: error("Scoreboards list not found")
                 scoreboards.forEach { scoreboard ->
                     if (!scoreboard.valid) return@forEach
-                    if (taskLifespan % scoreboard.globalUpdateTickInterval == 0) {
-                        scoreboard.update(floor(taskLifespan / scoreboard.globalUpdateTickInterval.toDouble()).toInt())
+
+                    if (taskLifespan % scoreboard.globalUpdateInterval.inWholeTicksInt == 0) {
+                        scoreboard.update(floor(taskLifespan / scoreboard.globalUpdateInterval.inTicks).toInt())
                         return@forEach
                     }
 
-                    if (scoreboard.title!!.customUpdateTickInterval != null && taskLifespan % scoreboard.title!!.customUpdateTickInterval!! == 0) {
-                        scoreboard.updateTitle(floor(taskLifespan / scoreboard.title!!.customUpdateTickInterval!!.toDouble()).toInt())
+                    if (scoreboard.title!!.customUpdateInterval != null && taskLifespan % scoreboard.title!!.customUpdateInterval!!.inWholeTicksInt == 0) {
+                        scoreboard.updateTitle(floor(taskLifespan / scoreboard.title!!.customUpdateInterval!!.inTicks).toInt())
                     } else {
                         for (line in scoreboard.lines) {
-                            if (line.customUpdateTickInterval != null && taskLifespan % line.customUpdateTickInterval!! == 0) {
-                                scoreboard.updateLine(line, floor(taskLifespan / line.customUpdateTickInterval!!.toDouble()).toInt())
+                            if (line.customUpdateInterval != null && taskLifespan % line.customUpdateInterval!!.inWholeTicksInt == 0) {
+                                scoreboard.updateLine(line, floor(taskLifespan / line.customUpdateInterval!!.inTicks).toInt())
                             }
                         }
                     }

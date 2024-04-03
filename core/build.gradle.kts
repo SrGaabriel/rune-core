@@ -3,6 +3,7 @@ plugins {
     kotlin("jvm")
     alias(rune.plugins.shadow)
     alias(rune.plugins.plugin.yml)
+    alias(rune.plugins.kotlinx.seralization)
     `rune-module`
 }
 
@@ -15,7 +16,9 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
+    api(rune.kotlinx.datetime)
     api(rune.kotlinx.coroutines.core)
+    api(rune.kotlinx.serialization.hocon)
     compileOnly(rune.protocol)
 }
 
