@@ -27,22 +27,28 @@ jobs:
         name: Upload Core
         with:
           name: Core
-          path: core//libs/
+          path: core/build/libs/
 
       - uses: actions/upload-artifact@v2
         name: Upload Commands
         with:
           name: Commands
-          path: features/commands//libs/
+          path: features/commands/build/libs/
 
       - uses: actions/upload-artifact@v2
         name: Upload Menus
         with:
           name: Menus
-          path: features/menus//libs/
+          path: features/menus/build/libs/
 
       - uses: actions/upload-artifact@v2
         name: Upload Scoreboards
         with:
           name: Scoreboard
           path: features/scoreboard/build/libs/
+
+      - uses: actions/upload-artifact@v2
+        name: Upload Databases
+        with:
+          name: Database
+          path: features/database/build/libs/
