@@ -2,10 +2,11 @@ package com.runerealms.core.feature.scoreboard.struct
 
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
+import kotlin.time.Duration
 
 public class ScoreboardLine(
     public val provider: (Player) -> List<Component>,
-    public var customUpdateTickInterval: Int? = null
+    public var customUpdateInterval: Duration? = null
 ) {
     internal val internalCache = mutableMapOf<Player, Component>()
 

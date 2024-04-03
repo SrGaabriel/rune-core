@@ -3,19 +3,21 @@ package com.runerealms.core.feature.scoreboard.struct
 import com.comphenix.protocol.events.PacketContainer
 import com.comphenix.protocol.wrappers.EnumWrappers
 import com.runerealms.core.RunePlugin
+import com.runerealms.core.ext.ticks
 import com.runerealms.core.feature.scoreboard.Scoreboards
 import com.runerealms.core.feature.scoreboard.packet.ScoreboardPacketAssembler
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import kotlin.time.Duration
 
 public class Scoreboard(
     plugin: RunePlugin,
     public val id: String
 ) {
     public var title: ScoreboardLine? = null
-    public var globalUpdateTickInterval: Int = 20
+    public var globalUpdateInterval: Duration = 20.ticks
     internal val valid: Boolean get() = title != null && lines.isNotEmpty()
 
     private val feature = plugin.feature(Scoreboards)
@@ -25,20 +27,20 @@ public class Scoreboard(
     public val lines: MutableList<ScoreboardLine> = mutableListOf()
     internal val viewers get() = feature.getViewers(this)
 
-    public fun title(customUpdateTickInterval: Int? = null, init: ScoreboardLine.Builder.(Player) -> Unit) {
-        title = buildLine(customUpdateTickInterval, init)
+    public fun title(customUpdateInterval: Duration? = null, init: ScoreboardLine.Builder.(Player) -> Unit) {
+        title = buildLine(customUpdateInterval, init)
     }
 
-    public fun line(customUpdateTickInterval: Int? = null, init: ScoreboardLine.Builder.(Player) -> Unit) {
-        lines.add(buildLine(customUpdateTickInterval, init))
+    public fun line(customUpdateInterval: Duration? = null, init: ScoreboardLine.Builder.(Player) -> Unit) {
+        lines.add(buildLine(customUpdateInterval, init))
     }
 
-    public fun buildLine(customUpdateTickInterval: Int? = null, init: ScoreboardLine.Builder.(Player) -> Unit): ScoreboardLine {
+    public fun buildLine(customUpdateInterval: Duration? = null, init: ScoreboardLine.Builder.(Player) -> Unit): ScoreboardLine {
         val line = ScoreboardLine(
             provider = { player ->
                 ScoreboardLine.Builder().apply { init(player) }.components
             },
-            customUpdateTickInterval = customUpdateTickInterval
+            customUpdateInterval = customUpdateInterval
         )
         return line
     }
