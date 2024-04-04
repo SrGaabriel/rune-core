@@ -1,3 +1,4 @@
+import com.runerealms.core.build.withCatalog
 import org.gradle.api.Project
 
 plugins {
@@ -14,6 +15,5 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":core"))
-    implementation(project(":features"))
+    compileOnly(project(":core"))
 }

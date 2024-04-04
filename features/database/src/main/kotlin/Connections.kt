@@ -20,6 +20,7 @@ public class PostgreDatabaseConnection(
             datasource.jdbcUrl = "jdbc:postgresql://${host}:${port}/${database}?useTimezone=true&serverTimezone=UTC"
             datasource.username = username
             datasource.password = password
+            datasource.driverClassName = "org.postgresql.Driver"
         }
         Database.connect(hikariDataSource)
     }

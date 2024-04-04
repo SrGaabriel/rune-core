@@ -108,7 +108,7 @@ public class Scoreboard(
             throw IllegalArgumentException("Player is not viewing the scoreboard")
         }
         sendPacket(packetAssembler.removeObjective(id))
-        feature.unregisterViewers(this, setOf(player.uniqueId))
+        feature.unregisterViewers(setOf(player.uniqueId))
     }
 
     public fun discard() {
@@ -117,21 +117,21 @@ public class Scoreboard(
 
     private fun sendPacket(packet: PacketContainer) {
         viewers.forEach { playerUuid ->
-            val player = Bukkit.getPlayer(playerUuid) ?: return@forEach feature.unregisterViewers(this, setOf(playerUuid))
+            val player = Bukkit.getPlayer(playerUuid) ?: return@forEach feature.unregisterViewers(setOf(playerUuid))
             protocolManager.sendServerPacket(player, packet)
         }
     }
 
     private fun sendIndividualPacket(packet: (Player) -> PacketContainer) {
         viewers.forEach {
-            val player = Bukkit.getPlayer(it) ?: return@forEach feature.unregisterViewers(this, setOf(it))
+            val player = Bukkit.getPlayer(it) ?: return@forEach feature.unregisterViewers(setOf(it))
             protocolManager.sendServerPacket(player, packet(player))
         }
     }
 
     private fun sendIndividualPackets(packet: MutableList<PacketContainer>.(Player) -> Unit) {
         viewers.forEach {
-            val player = Bukkit.getPlayer(it) ?: return@forEach feature.unregisterViewers(this, setOf(it))
+            val player = Bukkit.getPlayer(it) ?: return@forEach feature.unregisterViewers(setOf(it))
             mutableListOf<PacketContainer>().also{ list -> packet(list, player) }.forEach { packet ->
                 protocolManager.sendServerPacket(player, packet)
             }

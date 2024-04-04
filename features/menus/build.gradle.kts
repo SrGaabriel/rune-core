@@ -8,7 +8,3 @@ plugins {
 repositories {
     mavenCentral()
 }
-
-dependencies {
-    compileOnly(project(":core"))
-}

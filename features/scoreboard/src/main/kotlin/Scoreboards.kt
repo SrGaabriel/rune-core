@@ -36,7 +36,7 @@ public class Scoreboards(plugin: RunePlugin): RuneFeatureInstance(plugin) {
         return viewersMap.filter { it.value == scoreboard }.keys
     }
 
-    internal fun unregisterViewers(scoreboard: Scoreboard, viewers: Set<UUID>) {
+    internal fun unregisterViewers(viewers: Set<UUID>) {
         val viewersMap: MutableMap<UUID, Scoreboard> = CorePlugin.instance.getGlobalFeatureDataset("scoreboards.viewers") ?: error("Scoreboards viewers not found")
         viewers.forEach { viewersMap.remove(it) }
     }

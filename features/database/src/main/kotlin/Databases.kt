@@ -13,10 +13,16 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 import org.jetbrains.exposed.sql.transactions.transaction
 
 public class Databases(plugin: RunePlugin): RuneFeatureInstance(plugin = plugin) {
-    private val connections: MutableList<DatabaseConnection> = mutableListOf<DatabaseConnection>()
+    private val connections: MutableList<DatabaseConnection> = mutableListOf()
+    private val afterConnectingHandlers: MutableList<(DatabaseConnection) -> Unit> = mutableListOf()
 
     override fun onStart() {
-        connections.forEach { it.connect() }
+        connections.forEach {
+            it.connect()
+            afterConnectingHandlers.forEach { handler ->
+                handler(it)
+            }
+        }
     }
 
     public fun connectIntoCore() {
@@ -25,6 +31,10 @@ public class Databases(plugin: RunePlugin): RuneFeatureInstance(plugin = plugin)
 
     public fun tables(vararg tables: Table): Unit = transaction {
         SchemaUtils.createMissingTablesAndColumns(*tables)
+    }
+
+    public fun afterConnecting(handler: (DatabaseConnection) -> Unit) {
+        afterConnectingHandlers.add(handler)
     }
 
     private fun createConnectionFromConfig(config: CoreConfig): PostgreDatabaseConnection =

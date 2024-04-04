@@ -69,6 +69,7 @@ public class DefaultScoreboardPacketAssembler(): ScoreboardPacketAssembler {
         structure.integers.write(0, 0)
         structure.strings.write(0, "always")
         structure.strings.write(1, "always")
+        @Suppress("deprecation")
         structure.getEnumModifier(ChatColor::class.java, MinecraftReflection.getMinecraftClass("EnumChatFormat")).write(0, ChatColor.RESET)
         structure.chatComponents.write(1, AdventureComponentConverter.fromComponent(teamStructure.prefix))
         structure.chatComponents.write(2, AdventureComponentConverter.fromComponent(teamStructure.suffix))

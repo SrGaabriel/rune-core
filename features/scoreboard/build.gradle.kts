@@ -11,6 +11,5 @@ repositories {
 }
 
 dependencies {
-    compileOnly(project(":core"))
     compileOnly(rune.protocol)
 }

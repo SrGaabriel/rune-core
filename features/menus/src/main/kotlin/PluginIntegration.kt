@@ -76,7 +76,7 @@ public class RuneMenuManager {
     private fun changePage(view: RuneMenuView, newPage: Int) {
         val pagination = view.menu.pagination ?: return
         val availablePages = pagination.pages()
-        if (newPage < 1 || (availablePages != null && newPage > availablePages!!))
+        if (newPage < 1 || (availablePages != null && newPage > availablePages))
             return
         val event = MenuPageRenderEvent(
             view.menu,

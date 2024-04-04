@@ -12,8 +12,13 @@ repositories {
 }
 
 dependencies {
-    compileOnly(project(":core"))
     compileOnly(rune.brigadier)
     implementation(rune.commodore)
     implementation(rune.adventure.kotlin)
+}
+
+tasks {
+    shadowJar {
+        exclude("kotlin/**")
+    }
 }

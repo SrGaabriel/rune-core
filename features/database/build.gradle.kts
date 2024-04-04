@@ -1,4 +1,4 @@
-@Suppress("DSL_SCOPE_VIOLATION", "UnstableApiUsage")
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     kotlin("jvm")
     alias(rune.plugins.shadow)
@@ -11,17 +11,18 @@ repositories {
 }
 
 dependencies {
-    compileOnly(project(":core"))
+    compileOnly(kotlin("stdlib"))
     api(rune.exposed.core)
     api(rune.exposed.jdbc)
     api(rune.exposed.dao)
-    api(rune.kotlinx.datetime)
     api(rune.exposed.datetime)
+    api(rune.kotlinx.datetime)
+    implementation(rune.postgresql)
     implementation(rune.hikaricp)
 }
 
 tasks {
-    build {
-        dependsOn("reobfJar")
+    shadowJar {
+        exclude("kotlin/**")
     }
 }
