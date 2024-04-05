@@ -83,7 +83,6 @@ public class Scoreboard(
 
             val previousState = line.internalCache[player]
             val newState = components[state % components.size]
-            println(this@Scoreboard.lines.joinToString(", ") { LegacyComponentSerializer.legacyAmpersand().serialize(it.provider(player)[state % components.size]) })
 
             if (state != 0 && previousState != null && previousState != newState) {
                 add(packetAssembler.updateScore(id, previousState, score, EnumWrappers.ScoreboardAction.REMOVE))

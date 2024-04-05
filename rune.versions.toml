@@ -20,6 +20,8 @@ exposed="0.49.0"
 hikaricp = "5.0.1"
 postgresql = "42.7.3"
 
+cache4k = "0.13.0"
+
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinx-seralization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
@@ -51,3 +53,6 @@ exposed-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datetime", v
 
 hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+
+cache4k = { module = "io.github.reactivecircus.cache4k:cache4k", version.ref = "cache4k" }
+kotlin-reflection = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }

@@ -1,23 +1,24 @@
 package com.runerealms.core.feature.command.struct
 
-import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.builder.ArgumentBuilder
-import com.runerealms.core.feature.command.struct.argument.DelegatedArgument
-import com.runerealms.core.feature.command.util.StandardCommandContext
+import com.runerealms.core.feature.command.struct.types.ArgumentType
 import org.bukkit.command.CommandSender
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 public abstract class CommandNode(public open val name: String) {
     public val children: MutableList<CommandNode> = mutableListOf()
-    private var executor: (StandardCommandContext.() -> Unit)? = null
+    private var executor: (MinecraftCommandContext.() -> Unit)? = null
 
     @PublishedApi
-    internal var currentContext: StandardCommandContext? = null
-    public val isExecutable: Boolean get() = executor != null
-    public val delegatedArguments: MutableList<DelegatedArgument<*>> = mutableListOf()
+    internal var currentContext: MinecraftCommandContext? = null
 
-    public fun executor(executor: StandardCommandContext.() -> Unit) {
+    public val isExecutable: Boolean get() = executor != null
+
+    internal val delegatedArguments: MutableList<DelegatedArgument<*>> = mutableListOf()
+
+
+    public fun executor(executor: MinecraftCommandContext.() -> Unit) {
         this.executor = executor
     }
 
@@ -25,10 +26,6 @@ public abstract class CommandNode(public open val name: String) {
         for (name in names) {
             children.add(CommandLiteralNode(name).apply(scope))
         }
-    }
-
-    public fun <T : Any> argument(name: String, type: ArgumentType<T>, scope: CommandArgumentNode<T>.(CommandArgumentNode<T>) -> Unit) {
-        children.add(CommandArgumentNode(name, type).apply { scope(this) })
     }
 
     public fun <T : Any> requiredArgument(name: String, type: ArgumentType<T>): DelegatedArgument.Required<T> {
@@ -51,28 +48,7 @@ public abstract class CommandNode(public open val name: String) {
         }
     }
 
-//    public fun suggestions(vararg suggestions: String) {
-//        for (suggestion in suggestions) {
-//            literal(suggestion) {
-//                executor {
-//                    execute(StandardCommandContext(
-//                        source,
-//                        input,
-//                        arguments,
-//                        command,
-//                        rootNode,
-//                        nodes,
-//                        range,
-//                        child,
-//                        redirectModifier,
-//                        isForked
-//                    ))
-//                }
-//            }
-//        }
-//    }
-
-    public fun execute(context: StandardCommandContext) {
+    public fun execute(context: MinecraftCommandContext) {
         var caughtException: Throwable? = null
 
         try {
@@ -90,15 +66,26 @@ public abstract class CommandNode(public open val name: String) {
         ReadOnlyProperty { _, _ ->
             val context =
                 currentContext ?: error("Tried to delegate argument value while not in a command context")
-            context.getArgument(name, T::class.java)
+            context.run { infer() }
         }
 
     public inline operator fun <reified T : Any> DelegatedArgument.Optional<T>.provideDelegate(thisRef: Any?, property: KProperty<*>): ReadOnlyProperty<Any?, T?> =
         ReadOnlyProperty { _, _ ->
             val context =
                 currentContext ?: error("Tried to delegate argument value while not in a command context")
-            runCatching { context.getArgument(name, T::class.java) }.getOrNull() ?: return@ReadOnlyProperty null
+            context.run { inferOrNull() } ?: return@ReadOnlyProperty null
         }
 
     public abstract fun brigadierBuilder(): ArgumentBuilder<CommandSender, *>
+}
+
+public data class CommandLiteralNode(override val name: String): CommandNode(name) {
+    override fun equals(other: Any?): Boolean = other === this
+
+    override fun brigadierBuilder(): ArgumentBuilder<CommandSender, *> =
+        com.mojang.brigadier.builder.LiteralArgumentBuilder.literal(name)
+
+    override fun hashCode(): Int {
+        return javaClass.hashCode()
+    }
 }

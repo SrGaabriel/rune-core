@@ -1,5 +1,6 @@
 package com.runerealms.core.feature.command.util
 
+import com.mojang.brigadier.arguments.ArgumentType
 import com.runerealms.core.feature.command.struct.Command
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind

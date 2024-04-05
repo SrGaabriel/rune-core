@@ -4,7 +4,7 @@ import com.runerealms.core.RunePlugin
 import com.runerealms.core.lifecycle.ILifecycle
 
 public open class RuneFeatureInstance(
-    protected val plugin: RunePlugin
+    public val plugin: RunePlugin
 ): ILifecycle {
     public open fun install() {}
 
