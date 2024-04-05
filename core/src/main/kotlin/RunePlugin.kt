@@ -3,13 +3,16 @@ package com.runerealms.core
 import com.runerealms.core.feature.RuneFeature
 import com.runerealms.core.feature.RuneFeatureInstance
 import com.runerealms.core.lifecycle.ILifecycle
+import com.runerealms.core.locale.PluginLocale
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 
 public abstract class RunePlugin: JavaPlugin(), ILifecycle {
-    public val core: CorePlugin get() = Bukkit.getPluginManager().getPlugin("RuneCore") as CorePlugin
+    public val core: CorePlugin get() = CorePlugin.instance
     @PublishedApi
     internal val features: MutableMap<RuneFeature<*>, RuneFeatureInstance> = mutableMapOf()
+
+    public open var locale: PluginLocale? = null
 
     final override fun onEnable() {
         onStart()

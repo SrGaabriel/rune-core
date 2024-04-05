@@ -19,6 +19,7 @@ dependencies {
     api(rune.kotlinx.datetime)
     api(rune.kotlinx.coroutines.core)
     api(rune.kotlinx.serialization.hocon)
+    api(rune.cache4k)
     implementation(rune.kotlin.reflection)
     compileOnly(rune.protocol)
 }

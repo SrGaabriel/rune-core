@@ -1,22 +1,15 @@
 package com.runerealms.core.feature.command.adapter
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException
-import com.runerealms.core.RunePlugin
-import com.runerealms.core.feature.command.parser.TextCommandParser
+import com.runerealms.core.CorePlugin
+import com.runerealms.core.feature.command.Commands
 import com.runerealms.core.feature.command.struct.Command
 import com.runerealms.core.feature.command.struct.MinecraftCommandContext
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.event.ClickEvent
-import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.command.CommandSender
 import org.bukkit.command.defaults.BukkitCommand
-import kotlin.math.min
 
 public class RuneBukkitWrappedCommand(
-    public val plugin: RunePlugin,
-    private val parser: TextCommandParser,
-    wrapping: Command
+    public val feature: Commands,
+    public val wrapping: Command
 ): BukkitCommand(wrapping.officialName, wrapping.description.orEmpty(), wrapping.usage.orEmpty(), (wrapping.names - wrapping.officialName).toMutableList()) {
     private companion object {
 //        private val dispatcher = CommandDispatcher<CommandSender>()
@@ -31,58 +24,47 @@ public class RuneBukkitWrappedCommand(
 //    }
 
     override fun execute(sender: CommandSender, commandLabel: String, args: Array<out String>): Boolean {
-        println("Executing $commandLabel with args ${args.joinToString(", ")}")
         val text = if (args.isNotEmpty()) "$commandLabel ${args.joinToString(" ")}" else commandLabel
-        println("Still here")
 
-
-        try {
-            println("Cole world")
-            val call = parser.parse(text)
-            call.ifLeft {
-                sender.sendMessage(Component.text("Invalid command").color(NamedTextColor.RED))
-            }
-            call.ifRight {
-                println("VAMOOOS")
-                it.root.execute(
+        val result = feature.parser.parse(text)
+        result.fold(
+            {
+                sender.sendMessage(
+                    CorePlugin.instance.locale!!.key(
+                        "command.invalid-syntax",
+                        guessCommandUsage(wrapping, commandLabel)
+                    )
+                )
+            },
+            { call ->
+                call.root.execute(
                     MinecraftCommandContext(
-                        command = it.root,
-                        node = it.node,
-                        arguments = it.arguments,
-                        rawArguments = it.rawArguments.toList(),
+                        command = call.root,
+                        node = call.node,
+                        arguments = call.arguments,
+                        rawArguments = call.rawArguments.toList(),
                         sender = sender
                     )
                 )
             }
-
-            println("Debug")
-        } catch (exception: CommandSyntaxException) {
-            println("Fuck off ngga")
-            sender.sendMessage(Component.text(exception.rawMessage.string).color(NamedTextColor.RED))
-            if (exception.input != null && exception.cursor >= 0) {
-                val cursor = min(exception.input.length, exception.cursor)
-                val error = net.kyori.adventure.extra.kotlin.text {
-                    clickEvent(ClickEvent.clickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/$label"))
-                    if (cursor > 10) {
-                        append(Component.text("..."))
-                    }
-                    append(
-                        Component.text(exception.input.substring(0.coerceAtLeast(cursor - 10), cursor)).color(
-                            NamedTextColor.GRAY))
-                    if (cursor < exception.input.length) {
-                        append(
-                            Component.text(exception.input.substring(cursor)).color(
-                                NamedTextColor.RED
-                            ).decorate(TextDecoration.UNDERLINED)
-                        )
-                    }
-                    append(
-                        Component.translatable("command.context.here").color(NamedTextColor.RED).decorate(TextDecoration.ITALIC)
-                    )
-                }
-                sender.sendMessage(error)
-            }
-        }
+        )
         return true
+    }
+
+    public fun guessCommandUsage(command: Command, label: String): String {
+        val builder = StringBuilder()
+        builder.append("/$label")
+
+        if (command.delegatedArguments.isNotEmpty()) {
+            builder.append(" ")
+            builder.append(command.delegatedArguments.joinToString(" ") { "<${it.name}>" })
+        }
+
+        if (command.children.isNotEmpty()) {
+            builder.append(" [")
+            builder.append(command.children.joinToString("|"))
+            builder.append("] ...")
+        }
+        return builder.toString()
     }
 }

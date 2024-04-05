@@ -1,42 +1,41 @@
 package com.runerealms.core.feature.command.parser
 
-import com.mojang.datafixers.util.Either
 import com.runerealms.core.feature.command.Commands
-import com.runerealms.core.feature.command.repository.CommandRepository
 import com.runerealms.core.feature.command.struct.*
-import com.runerealms.core.feature.command.util.ArgumentMap
 import com.runerealms.core.feature.command.util.MutableArgumentMap
 import com.runerealms.core.feature.command.util.StringReader
+import com.runerealms.core.feature.command.parser.CommandParser.ParsingResult
+import com.runerealms.core.monad.Either
 
-public open class TextCommandParser(private val repository: CommandRepository) {
-    public var caseSensitive: Boolean = false
+public open class TextCommandParser(private val feature: Commands): CommandParser {
+    override var caseSensitive: Boolean = false
 
-    public fun parse(text: String): Either<ParsingResult.Failure, CommandCall> {
+    public override fun parse(text: String): Either<ParsingResult.Failure, CommandCall> {
         val content = text.trim().ifBlank { return Either.left(ParsingResult.Failure) }
-//        val cached = cache?.get(content)
-//        if (cached != null)
-//            return cached
+        val cached = feature.cache?.get(content)
+        if (cached != null)
+            return cached
 
-        val split = content.split(" ")
-        println(content)
-        println(split)
-        val root = repository.search(
+        val split = content.split(' ')
+        val root = feature.repository.search(
             name = split.first(),
             ignoreCase = !caseSensitive
         ) ?: return Either.left(ParsingResult.Failure)
         val args = split.drop(1).toMutableList()
+        val result = getCommandCall(root, args)
 
-        return getCommandCall(root, args)
+        feature.cache?.put(content, result)
+        return result
     }
 
-    protected fun getCommandCall(root: Command, arguments: List<String>): Either<ParsingResult.Failure, CommandCall> {
+    private fun getCommandCall(root: Command, arguments: List<String>): Either<ParsingResult.Failure, CommandCall> {
         if (root.children.isEmpty() && root.delegatedArguments.isEmpty() && arguments.isEmpty())
             return Either.right(CommandCall(root, root, mutableMapOf(), arguments))
         else if (root.children.isEmpty() && root.delegatedArguments.isEmpty())
             return Either.left(ParsingResult.Failure)
         val stringReader = StringReader(arguments)
 
-        val result = scanCallAndStoreArguments(root, stringReader)
+        val result = parseCall(root, stringReader)
         if (result is ParsingResult.Failure)
             return Either.left(ParsingResult.Failure)
         else {
@@ -45,19 +44,16 @@ public open class TextCommandParser(private val repository: CommandRepository) {
         }
     }
 
-    protected fun scanCallAndStoreArguments(command: Command, reader: StringReader): ParsingResult {
+    private fun parseCall(command: Command, reader: StringReader): ParsingResult {
         if (!reader.hasMore && command.delegatedArguments.filterIsInstance<DelegatedArgument.Required<*>>().isNotEmpty()) {
             return ParsingResult.Failure
         }
-        println("kfsda")
 
         var currentNode: CommandNode = command
         val arguments: MutableArgumentMap = mutableMapOf()
-        println("lele")
         while (reader.hasMore) {
             val matchingLiteral =
                 currentNode.children.firstOrNull { it is CommandLiteralNode && it.name.equals(reader.peek(), !caseSensitive) }
-            println("opa")
 
             if (matchingLiteral != null) {
                 reader.index++
@@ -65,39 +61,28 @@ public open class TextCommandParser(private val repository: CommandRepository) {
                 continue
             }
 
-            println("Made it here")
             var argumentIndex = 0
             while (argumentIndex < command.delegatedArguments.size) {
-                println("Argument index: $argumentIndex")
                 val argument = command.delegatedArguments[argumentIndex]
-                println("Argument: $argument")
                 argumentIndex++
-                println("Argument index: $argumentIndex")
 
                 when {
                     argument is DelegatedArgument.Required<*> && !reader.hasMore -> {
-                        println("Required argument not found")
                         return ParsingResult.Failure
                     }
                     argument is DelegatedArgument.Optional<*> && !reader.hasMore -> {
-                        println("Optional argument not found")
                         continue
                     }
                     argument is DelegatedArgument.Optional<*> && !argument.type.isParseable(reader) -> {
-                        println("Optional argument not parseable")
                         if (command.delegatedArguments.size == 1)
                             return ParsingResult.Failure
-                        println("Passed")
                         continue
                     }
                 }
-
-                println("Argument type: ${argument.type}")
 
                 if (!argument.type.isParseable(reader)) {
                     return ParsingResult.Failure
                 }
-                println("Argument type is parseable")
                 arguments[argument] = argument.type.parse(reader)
             }
 
@@ -126,14 +111,5 @@ public open class TextCommandParser(private val repository: CommandRepository) {
             node = currentNode,
             arguments = arguments
         )
-    }
-
-    public sealed interface ParsingResult {
-        public data class Success(
-            public val node: CommandNode,
-            public val arguments: ArgumentMap,
-        ): ParsingResult
-
-        public object Failure: ParsingResult
     }
 }

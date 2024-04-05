@@ -1,7 +1,12 @@
 package com.runerealms.core.config
 
 import com.runerealms.core.RunePlugin
+import com.runerealms.core.locale.PluginLocale
+import com.typesafe.config.ConfigFactory
 
-fun RunePlugin.createLocale(fileName: String, defaul) {
-
+public fun RunePlugin.createLocale(nameWithoutExtension: String, builder: PluginLocale.Builder.() -> Unit): PluginLocale {
+    val locale = PluginLocale.Builder().apply(builder).build()
+    val default = ConfigFactory.parseMap(locale.toMap())
+    val parsed = hoconConfig(nameWithoutExtension, default)
+    return PluginLocale.fromConfig(parsed)
 }
