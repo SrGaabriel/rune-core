@@ -51,3 +51,5 @@ exposed-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datetime", v
 
 hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+
+kotlin-reflection = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
