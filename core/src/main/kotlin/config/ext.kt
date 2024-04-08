@@ -40,7 +40,7 @@ public inline fun <reified T> RunePlugin.hoconConfig(
 
 @PublishedApi
 internal val hocon: Hocon = Hocon {
-    encodeDefaults = true
+    encodeDefaults = false
 }
 
 @PublishedApi

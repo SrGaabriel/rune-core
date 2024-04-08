@@ -60,7 +60,6 @@ public data class RuneMenu(
         val bukkitView = player.openInventory(inventory) ?: error("Couldn't create inventory view")
         val view = RuneMenuView(this, render, bukkitView, inventory, defaultFlags, data, page)
         feature.menuViewers[player.uniqueId] = view
-        println("Added, ${feature.menuViewers}")
         onOpen(MenuOpenEvent(view))
     }
 

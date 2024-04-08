@@ -9,7 +9,7 @@ public class CachedSqlRepository<Key : Comparable<Key>, Value : Entity<Key>>(
     entityClass: EntityClass<Key, Value>,
     cacheBuilder: Cache.Builder<Key, Value>,
 ): SqlRepository<Key, Value>(entityClass) {
-    private val cache = cacheBuilder.build()
+    public val cache: Cache<Key, Value> = cacheBuilder.build()
 
     override fun <T> transactionScope(block: () -> T): T = transaction {
         block()
@@ -30,7 +30,7 @@ public class CachedSqlRepository<Key : Comparable<Key>, Value : Entity<Key>>(
 
     override fun remove(key: Key) {
         transactionScope {
-            entityClass.findById(key)?.delete()
+            (cache.get(key) ?: entityClass.findById(key))?.delete()
         }
         cache.invalidate(key)
     }

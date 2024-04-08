@@ -19,6 +19,8 @@ dependencies {
     api(rune.kotlinx.datetime)
     implementation(rune.postgresql)
     implementation(rune.hikaricp)
+    implementation(rune.mysql)
+    implementation(rune.sqlite)
 }
 
 tasks {

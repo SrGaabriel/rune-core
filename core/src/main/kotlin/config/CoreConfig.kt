@@ -8,6 +8,13 @@ public data class CoreConfig(
 ) {
     @Serializable
     public data class DatabaseConfig(
+        val type: String,
+        val sqlite: String? = null,
+        val database: DatabaseStructure? = null,
+    )
+
+    @Serializable
+    public data class DatabaseStructure(
         val host: String,
         val port: Int,
         val username: String,
@@ -18,11 +25,8 @@ public data class CoreConfig(
     public companion object {
         public val Default: CoreConfig = CoreConfig(
             database = DatabaseConfig(
-                host = "localhost",
-                port = 3306,
-                username = "root",
-                password = "password",
-                database = "database"
+                type = "sqlite",
+                sqlite = "database.db"
             )
         )
     }

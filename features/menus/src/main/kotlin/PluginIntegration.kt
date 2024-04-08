@@ -8,6 +8,7 @@ import com.runerealms.core.feature.menu.action.MenuCloseEvent
 import com.runerealms.core.feature.menu.action.MenuItemClickEvent
 import com.runerealms.core.feature.menu.action.MenuPageRenderEvent
 import net.kyori.adventure.text.Component
+import org.bukkit.Bukkit
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.inventory.InventoryCreativeEvent
@@ -27,21 +28,15 @@ public class RuneMenuManager(private val menus: Menus) {
             handler<InventoryOpenEvent> {
                 val view = this@RuneMenuManager.viewers[view.player.uniqueId]
                 if (view == null || view.bukkitView != getView()) {
-                    println("Removed bitch")
                     this@RuneMenuManager.viewers.remove(player.uniqueId)
                 }
             }
             handler<InventoryClickEvent> {
-                println("Debug 1")
-                println(this@RuneMenuManager.viewers)
                 val view = this@RuneMenuManager.viewers[view.player.uniqueId] ?: return@handler
-                println("Debug 2 $view")
                 isCancelled = view.flags.cancelOnClick
-                println("Debug 3 $isCancelled")
                 val item = view.items.firstOrNull {
                     it.slot == slot
-                } ?: return@handler println("Debug BASE")
-                println("Still here!!!!")
+                } ?: return@handler
                 item.onClick(
                     MenuItemClickEvent(
                         view = view,
@@ -49,7 +44,6 @@ public class RuneMenuManager(private val menus: Menus) {
                         event = this
                     )
                 )
-                println("Wow")
                 if (slot == view.menu.pagination?.nextPageButton?.slot) {
                     isCancelled = true
                     changePage(view, view.page+1)
@@ -80,9 +74,11 @@ public class RuneMenuManager(private val menus: Menus) {
                 view.menu.onClose(equivalentEvent)
                 if (equivalentEvent.reopen != null) {
                     if (equivalentEvent.reopen!!.rerender) {
-                        view.menu.open(view.player)
+                        view.menu.open(view.player, view.data)
                     } else {
-                        view.menu.open(view.player, view.render, view.data, view.page)
+                        Bukkit.getScheduler().runTask(plugin, Runnable {
+                            view.menu.open(view.player, view.render, view.data, view.page)
+                        })
                     }
                 } else {
                     this@RuneMenuManager.viewers.remove(player.uniqueId)

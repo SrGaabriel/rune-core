@@ -37,14 +37,37 @@ public class Databases(plugin: RunePlugin): RuneFeatureInstance(plugin = plugin)
         afterConnectingHandlers.add(handler)
     }
 
-    private fun createConnectionFromConfig(config: CoreConfig): PostgreDatabaseConnection =
-        PostgreDatabaseConnection(
-            host = config.database.host,
-            port = config.database.port.toString(),
-            database = config.database.database,
-            username = config.database.username,
-            password = config.database.password
-        )
+    private fun createConnectionFromConfig(config: CoreConfig): DatabaseConnection {
+        when (config.database.type.lowercase()) {
+            "postgresql" -> {
+                val postgre = config.database.database ?: error("Database configuration not found")
+                return PostgreDatabaseConnection(
+                    host = postgre.host,
+                    port = postgre.port.toString(),
+                    database = postgre.database,
+                    username = postgre.username,
+                    password = postgre.password
+                )
+            }
+            "mysql" -> {
+                val mysql = config.database.database ?: error("Database configuration not found")
+                return MysqlDatabaseConnection(
+                    host = mysql.host,
+                    port = mysql.port.toString(),
+                    database = mysql.database,
+                    username = mysql.username,
+                    password = mysql.password
+                )
+            }
+            "sqlite" -> {
+                val sqlitePath = config.database.sqlite ?: error("Sqlite path not found")
+                return SqliteDatabaseConnection(
+                    path = CorePlugin.instance.dataFolder.absolutePath + "/" + sqlitePath
+                )
+            }
+            else -> error("Database type not supported")
+        }
+    }
 
     public companion object: RuneFeature<Databases>() {
         override fun create(plugin: RunePlugin): Databases =

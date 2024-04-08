@@ -19,6 +19,8 @@ protocol-lib = "5.0.0"
 exposed="0.49.0"
 hikaricp = "5.0.1"
 postgresql = "42.7.3"
+mysql = "8.0.33"
+sqlite = "3.45.2.0"
 
 cache4k = "0.13.0"
 
@@ -51,6 +53,8 @@ exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exp
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
 exposed-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datetime", version.ref = "exposed" }
 
+mysql = { module = "mysql:mysql-connector-java", version.ref = "mysql" }
+sqlite = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite" }
 hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 
