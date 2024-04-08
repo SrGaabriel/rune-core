@@ -1,18 +1,17 @@
+@file:OptIn(ExperimentalSerializationApi::class)
+
 package com.runerealms.core.config
 
 import com.runerealms.core.RunePlugin
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigRenderOptions
-import com.typesafe.config.parser.ConfigDocumentFactory
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.hocon.Hocon
 import kotlinx.serialization.hocon.decodeFromConfig
 import kotlinx.serialization.hocon.encodeToConfig
 
-@OptIn(ExperimentalSerializationApi::class)
 public inline fun <reified T : Any> RunePlugin.hoconConfig(nameWithoutExtension: String, default: T): T {
-    val hocon = Hocon { encodeDefaults = true }
     return hoconConfig(nameWithoutExtension, default, { hocon.decodeFromConfig(it) }, { hocon.encodeToConfig(it) })
 }
 
@@ -40,4 +39,13 @@ public inline fun <reified T> RunePlugin.hoconConfig(
 }
 
 @PublishedApi
-internal val DefaultRenderOptions: ConfigRenderOptions = ConfigRenderOptions.concise()
+internal val hocon: Hocon = Hocon {
+    encodeDefaults = true
+}
+
+@PublishedApi
+internal val DefaultRenderOptions: ConfigRenderOptions = ConfigRenderOptions.defaults()
+    .setOriginComments(false)
+    .setJson(false)
+    .setFormatted(true)
+    .setComments(false)

@@ -19,21 +19,29 @@ import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.PlayerInventory
 import java.util.UUID
 
-public class RuneMenuManager {
-    public val viewers: MutableMap<UUID, RuneMenuView> = mutableMapOf()
-    public val menus: MutableMap<String, RuneMenu> = mutableMapOf()
+public class RuneMenuManager(private val menus: Menus) {
+    public val viewers: MutableMap<UUID, RuneMenuView> get() = menus.menuViewers
 
-    public fun installHandlers(plugin: RunePlugin) {
-        plugin.listener {
+    public fun installHandlers() {
+        menus.plugin.listener {
             handler<InventoryOpenEvent> {
-                this@RuneMenuManager.viewers.remove(player.uniqueId)
+                val view = this@RuneMenuManager.viewers[view.player.uniqueId]
+                if (view == null || view.bukkitView != getView()) {
+                    println("Removed bitch")
+                    this@RuneMenuManager.viewers.remove(player.uniqueId)
+                }
             }
             handler<InventoryClickEvent> {
+                println("Debug 1")
+                println(this@RuneMenuManager.viewers)
                 val view = this@RuneMenuManager.viewers[view.player.uniqueId] ?: return@handler
+                println("Debug 2 $view")
                 isCancelled = view.flags.cancelOnClick
+                println("Debug 3 $isCancelled")
                 val item = view.items.firstOrNull {
                     it.slot == slot
-                } ?: return@handler
+                } ?: return@handler println("Debug BASE")
+                println("Still here!!!!")
                 item.onClick(
                     MenuItemClickEvent(
                         view = view,
@@ -41,6 +49,7 @@ public class RuneMenuManager {
                         event = this
                     )
                 )
+                println("Wow")
                 if (slot == view.menu.pagination?.nextPageButton?.slot) {
                     isCancelled = true
                     changePage(view, view.page+1)

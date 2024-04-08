@@ -5,15 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9422235b-e0b4-4eea-94c3-2f912e0ea472" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/features/database/src/main/kotlin/repository/CachedSqlRepository.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/features/database/src/main/kotlin/repository/Repository.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/features/database/src/main/kotlin/repository/SqlRepository.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/features/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/features/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/features/menus/src/main/kotlin/FantasyMenu.kt" beforeDir="false" afterPath="$PROJECT_DIR$/features/menus/src/main/kotlin/RuneMenu.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/features/menus/src/main/kotlin/FantasyMenuItem.kt" beforeDir="false" afterPath="$PROJECT_DIR$/features/menus/src/main/kotlin/RuneMenuItem.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/features/menus/src/main/kotlin/FantasyMenuView.kt" beforeDir="false" afterPath="$PROJECT_DIR$/features/menus/src/main/kotlin/RuneMenuView.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/kotlin/RunePlugin.kt" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/kotlin/RunePlugin.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/kotlin/config/ext.kt" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/kotlin/config/ext.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/kotlin/config/locale.kt" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/kotlin/config/locale.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/kotlin/locale/PluginLocale.kt" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/kotlin/locale/PluginLocale.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/features/commands/src/main/kotlin/adapter/Adapter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/features/commands/src/main/kotlin/adapter/Adapter.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/features/menus/src/main/kotlin/Menus.kt" beforeDir="false" afterPath="$PROJECT_DIR$/features/menus/src/main/kotlin/Menus.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/features/menus/src/main/kotlin/PluginIntegration.kt" beforeDir="false" afterPath="$PROJECT_DIR$/features/menus/src/main/kotlin/PluginIntegration.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/features/menus/src/main/kotlin/action/Actions.kt" beforeDir="false" afterPath="$PROJECT_DIR$/features/menus/src/main/kotlin/action/Actions.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/features/menus/src/main/kotlin/RuneMenu.kt" beforeDir="false" afterPath="$PROJECT_DIR$/features/menus/src/main/kotlin/RuneMenu.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,8 +51,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Kotlin Class" />
         <option value="Kotlin Interface" />
+        <option value="Kotlin Class" />
       </list>
     </option>
   </component>
@@ -68,30 +71,34 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Gradle.rune-core [build].executor": "Run",
-    "Gradle.rune-core [reobfJar].executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "reference.settingsdialog.project.gradle",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Gradle.Download Sources.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.rune-core [build].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.rune-core [reobfJar].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.project.gradle&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="rune-core [reobfJar]" type="GradleRunConfiguration" factoryName="Gradle">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="--scan" />
+        <option name="scriptParameters" value="--scan --info" />
         <option name="taskDescriptions">
           <list />
         </option>
@@ -125,7 +132,9 @@
       <workItem from="1712312912403" duration="758000" />
       <workItem from="1712313683222" duration="9289000" />
       <workItem from="1712535316374" duration="1703000" />
-      <workItem from="1712537048451" duration="1554000" />
+      <workItem from="1712537048451" duration="1940000" />
+      <workItem from="1712591671153" duration="10973000" />
+      <workItem from="1712608133642" duration="2114000" />
     </task>
     <servers />
   </component>

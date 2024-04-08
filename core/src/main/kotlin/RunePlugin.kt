@@ -12,7 +12,11 @@ public abstract class RunePlugin: JavaPlugin(), ILifecycle {
     @PublishedApi
     internal val features: MutableMap<RuneFeature<*>, RuneFeatureInstance> = mutableMapOf()
 
-    public open var locale: PluginLocale? = null
+    public open var localeOrNull: PluginLocale? = null
+    public var locale: PluginLocale get() = localeOrNull ?: error("Locale not initialized")
+        set(value) {
+            localeOrNull = value
+        }
 
     final override fun onEnable() {
         onStart()

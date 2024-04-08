@@ -8,5 +8,7 @@ public fun RunePlugin.createLocale(nameWithoutExtension: String, builder: Plugin
     val locale = PluginLocale.Builder().apply(builder).build()
     val default = ConfigFactory.parseMap(locale.toMap())
     val parsed = hoconConfig(nameWithoutExtension, default)
-    return PluginLocale.fromConfig(parsed)
+    val result = PluginLocale.fromConfig(parsed)
+    this.localeOrNull = result
+    return result
 }

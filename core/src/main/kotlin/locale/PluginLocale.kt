@@ -1,6 +1,7 @@
 package com.runerealms.core.locale
 
 import com.typesafe.config.Config
+import org.bukkit.ChatColor
 
 public interface PluginLocale {
     public operator fun get(key: String): String
@@ -11,7 +12,7 @@ public interface PluginLocale {
             placeholders.getOrNull(index) ?: it.value
         }
 
-    public fun toMap(): Map<String, String> = emptyMap()
+    public fun toMap(): Map<String, String>
 
     public class Builder {
         private val translations = mutableMapOf<String, String>()
@@ -21,20 +22,29 @@ public interface PluginLocale {
             return this
         }
 
-        public fun build(): PluginLocale = object : PluginLocale {
-            override fun get(key: String): String = translations[key] ?: key
-        }
+        public fun build(): PluginLocale = HashMapLocale(translations)
     }
 
     public companion object {
-        public fun fromConfig(config: Config): PluginLocale {
-            val translations = mutableMapOf<String, String>()
-            for ((key, value) in config.root().unwrapped()) {
-                translations[key] = value.toString().replace('&', '§')
-            }
-            return object : PluginLocale {
-                override fun get(key: String): String = translations[key] ?: key
-            }
-        }
+        public fun fromConfig(config: Config): PluginLocale =
+            ConfigLocale(config)
     }
+}
+
+public class HashMapLocale(
+    public val hashmap: MutableMap<String, String> = mutableMapOf()
+): PluginLocale {
+    override fun get(key: String): String = hashmap[key] ?: key
+
+    override fun toMap(): Map<String, String> = hashmap
+}
+
+public class ConfigLocale(
+    private val config: Config
+): PluginLocale {
+    @Suppress("Deprecation")
+    override fun get(key: String): String =
+        ChatColor.translateAlternateColorCodes('&', config.getString(key) ?: key)
+
+    override fun toMap(): Map<String, String> = config.entrySet().associate { it.key to it.value.unwrapped().toString() }
 }

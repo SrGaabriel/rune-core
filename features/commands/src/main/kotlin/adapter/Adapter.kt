@@ -30,8 +30,8 @@ public class RuneBukkitWrappedCommand(
         result.fold(
             {
                 sender.sendMessage(
-                    CorePlugin.instance.locale!!.key(
-                        "command.invalid-syntax",
+                    CorePlugin.instance.locale.key(
+                        "commands.invalid-syntax",
                         guessCommandUsage(wrapping, commandLabel)
                     )
                 )

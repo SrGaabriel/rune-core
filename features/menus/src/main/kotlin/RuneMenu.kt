@@ -45,14 +45,14 @@ public data class RuneMenu(
             if (pageRenderEvent.isCancelled)
                 return
         }
-        open(player, renderEvent.render, mutableMapOf())
+        open(player, renderEvent.render, data)
     }
 
     public fun open(player: Player, render: InventoryRender, data: MutableMap<String, Any> = mutableMapOf(), page: Int = 1) {
         val inventory = Bukkit.createInventory(
             null,
-            render.size ?: error("Can't open an inventory without a size. Provide one either in the menu's construction or in the onRender scope."),
-            render.title ?: error("Can't open an inventory without a title. Provide one either in the menu's construction or in the onRender scope.")
+            render.size ?: error("Can't open an inventory without a size. Provide one either in the menu's constructor or in the onRender scope."),
+            render.title ?: error("Can't open an inventory without a title. Provide one either in the menu's constructor or in the onRender scope.")
         )
         render.items.forEach {
             inventory.setItem(it.slot, it.item)
@@ -60,6 +60,7 @@ public data class RuneMenu(
         val bukkitView = player.openInventory(inventory) ?: error("Couldn't create inventory view")
         val view = RuneMenuView(this, render, bukkitView, inventory, defaultFlags, data, page)
         feature.menuViewers[player.uniqueId] = view
+        println("Added, ${feature.menuViewers}")
         onOpen(MenuOpenEvent(view))
     }
 
