@@ -4,6 +4,7 @@ import com.runerealms.core.RunePlugin
 import com.runerealms.core.ext.handler
 import com.runerealms.core.ext.listener
 import com.runerealms.core.ext.nextTick
+import com.runerealms.core.feature.menu.action.MenuCloseEvent
 import com.runerealms.core.feature.menu.action.MenuItemClickEvent
 import com.runerealms.core.feature.menu.action.MenuPageRenderEvent
 import net.kyori.adventure.text.Component
@@ -62,7 +63,21 @@ public class RuneMenuManager {
                 isCancelled = if (playerInventory == source) view.flags.cancelOnMoveItemIn else view.flags.cancelOnMoveItemOut
             }
             handler<InventoryCloseEvent> {
-                this@RuneMenuManager.viewers.remove(player.uniqueId)
+                val view = this@RuneMenuManager.viewers[view.player.uniqueId] ?: return@handler
+                val equivalentEvent = MenuCloseEvent(
+                    view = view,
+                    reason = reason
+                )
+                view.menu.onClose(equivalentEvent)
+                if (equivalentEvent.reopen != null) {
+                    if (equivalentEvent.reopen!!.rerender) {
+                        view.menu.open(view.player)
+                    } else {
+                        view.menu.open(view.player, view.render, view.data, view.page)
+                    }
+                } else {
+                    this@RuneMenuManager.viewers.remove(player.uniqueId)
+                }
             }
             handler<PlayerJoinEvent> {
                 this@RuneMenuManager.viewers.remove(player.uniqueId)

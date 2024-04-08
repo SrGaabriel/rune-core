@@ -91,6 +91,32 @@ public open class MenuOpenEvent(
     }
 }
 
+public open class MenuCloseEvent(
+    public val view: RuneMenuView,
+    public val reason: Reason
+): MenuActionEvent(view.menu, view.render, view.player) {
+    public val bukkitView: InventoryView get() = view.bukkitView
+    internal var reopen: Reopen? = null
+
+    override fun open(menu: RuneMenu) {
+        Bukkit.getScheduler().runTask(view.menu.plugin, Runnable {
+            menu.open(player)
+        })
+    }
+
+    override fun reopen(renderAgain: Boolean) {
+        reopen = Reopen(renderAgain)
+    }
+
+    override fun close(reason: Reason) {
+        reopen = null
+    }
+
+    public data class Reopen(
+        val rerender: Boolean
+    )
+}
+
 public abstract class MenuItemActionEvent(
     view: RuneMenuView,
     public val item: RuneMenuItem

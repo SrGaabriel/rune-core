@@ -1,6 +1,7 @@
 package com.runerealms.core.feature.menu
 
 import com.runerealms.core.RunePlugin
+import com.runerealms.core.feature.menu.action.MenuCloseEvent
 import com.runerealms.core.feature.menu.action.MenuOpenEvent
 import com.runerealms.core.feature.menu.action.MenuPageRenderEvent
 import com.runerealms.core.feature.menu.action.MenuRenderEvent
@@ -19,6 +20,7 @@ public data class RuneMenu(
 
     public var onRender: MenuRenderEvent.() -> Unit = {}
     public var onOpen: MenuOpenEvent.() -> Unit = {}
+    public var onClose: MenuCloseEvent.() -> Unit = {}
 
     internal var pagination: MenuPagination? = null
     public var defaultFlags: RuneMenuView.Flags = RuneMenuView.Flags()
@@ -77,5 +79,15 @@ public data class RuneMenu(
 
     public fun onOpen(handler: MenuOpenEvent.() -> Unit) {
         onOpen = handler
+    }
+
+    public fun onClose(handler: MenuCloseEvent.() -> Unit) {
+        onClose = handler
+    }
+
+    public fun uncloseable(rerender: Boolean = false) {
+        onClose {
+            reopen(rerender)
+        }
     }
 }
