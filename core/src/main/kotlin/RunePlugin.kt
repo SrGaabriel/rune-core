@@ -4,7 +4,6 @@ import com.runerealms.core.feature.RuneFeature
 import com.runerealms.core.feature.RuneFeatureInstance
 import com.runerealms.core.lifecycle.ILifecycle
 import com.runerealms.core.locale.PluginLocale
-import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 
 public abstract class RunePlugin: JavaPlugin(), ILifecycle {
